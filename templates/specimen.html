@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Typographic Specimen</title>
+<style>
+/* injected font-face rules */
+{{{css}}}
+
+:root {
+  --page-bg: #fff;
+  --text-color: #111;
+  --muted: #666;
+}
+
+body {
+  margin: 32px;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  color: var(--text-color);
+  background: var(--page-bg);
+}
+
+.header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom: 20px;
+}
+.header h1 { margin:0; font-size:28px; }
+.header .meta { text-align:right; color:var(--muted); font-size:12px; }
+
+.sample {
+  margin: 20px 0 40px 0;
+  padding: 18px;
+  border-radius: 8px;
+  background: #f8f8f9;
+}
+
+/* font card */
+.font-card {
+  margin-bottom: 28px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eee;
+}
+.font-name {
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+.preview {
+  display:block;
+  margin: 12px 0;
+  font-size: 48px;
+  line-height: 1.05;
+}
+.info { color:var(--muted); font-size:12px; }
+
+.small-sample { font-size:16px; margin-top:10px; }
+
+/* sizes table */
+.sizes { display:flex; gap:12px; flex-wrap:wrap; margin-top:10px; }
+.size-box { min-width:120px; padding:10px; border-radius:6px; background:#fff; box-shadow:0 0 0 1px #f0f0f0 inset; text-align:center; }
+.size-box .sz { font-weight:700; display:block; }
+.size-box .ex { font-size:13px; color:var(--muted); margin-top:6px; }
+
+/* print-friendly adjustments */
+@media print {
+  body { margin: 10mm; }
+}
+</style>
+</head>
+<body>
+  <div class="header">
+    <h1>Typographic Specimen</h1>
+    <div class="meta">
+      Generated: {{date}}<br>
+      Sample text: "{{sampleText}}"
+    </div>
+  </div>
+
+  <div class="sample">
+    <div class="info">Sample paragraph / pangram</div>
+    <div style="margin-top:8px; font-size:20px;">{{sampleText}}</div>
+  </div>
+
+  {{#fonts}}
+  <section class="font-card">
+    <div class="font-name">{{family}} <span class="info">({{filename}})</span></div>
+
+    <!-- Large display -->
+    <div class="preview" style="font-family: '{{family}}', sans-serif;">
+      {{sampleText}}
+    </div>
+
+    <!-- sizes -->
+    <div class="sizes">
+      <div class="size-box" style="font-family: '{{family}}', sans-serif;">
+        <span class="sz">72px</span>
+        <span class="ex">ABCDEFGHIJKLMNOPQRSTUVWXYZ</span>
+      </div>
+      <div class="size-box" style="font-family: '{{family}}', sans-serif;">
+        <span class="sz">36px</span>
+        <span class="ex">abcdefghijklmnopqrstuvwxyz</span>
+      </div>
+      <div class="size-box" style="font-family: '{{family}}', sans-serif;">
+        <span class="sz">18px</span>
+        <span class="ex">0123456789 &amp; punctuation</span>
+      </div>
+    </div>
+
+    <div class="small-sample" style="font-family: '{{family}}', sans-serif;">
+      <strong>Sentence:</strong> {{sampleText}}<br>
+      <strong>Notes:</strong> Add notes here (weight, designer, classification).
+    </div>
+  </section>
+  {{/fonts}}
+
+  <footer style="margin-top:40px; color:var(--muted); font-size:12px;">
+    This specimen was generated automatically by a GitHub Actions workflow.
+  </footer>
+</body>
+</html>
