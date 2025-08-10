@@ -1,0 +1,44 @@
+name: Generate Typographic Specimen
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: |
+          npm ci
+
+      - name: Generate specimen (HTML, PDF, PNG)
+        env:
+          SPECIMEN_OUTPUT_DIR: ./specimen-output
+          FONT_DIR: ./fonts
+          SAMPLE_TEXT: "The quick brown fox jumps over the lazy dog — ÁÉÍÓÚ ÃÕ Ç Ñ"
+        run: |
+          mkdir -p $SPECIMEN_OUTPUT_DIR
+          node scripts/generate-specimen.js
+
+      - name: Upload specimen artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: typographic-specimen
+          path: specimen-output
+
+      # Optional: publish to GitHub Pages (uncomment if you want)
+      # - name: Deploy to GitHub Pages
+      #   uses: peaceiris/actions-gh-pages@v4
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     publish_dir: ./specimen-output
