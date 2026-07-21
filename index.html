@@ -6,20 +6,14 @@
     <title>Typography Tester</title>
     <style>
         :root {
-            --bg: #000000;          /* Absolute black for background */
-            --surface: #1a1a1a;     /* Dark gray for panels */
-            --border: #333333;      /* Medium gray for borders */
-            --text: #ffffff;        /* White for main text */
-            --muted: #888888;       /* Light gray for secondary text */
-            --accent: #ffffff;      /* White for focus/highlight */
+            --bg: #000000;
+            --surface: #1a1a1a;
+            --border: #333333;
+            --text: #ffffff;
+            --muted: #888888;
+            --accent: #ffffff;
         }
-
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             background-color: var(--bg);
@@ -27,31 +21,10 @@
             min-height: 100vh;
             padding: 20px;
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        header {
-            margin-bottom: 40px;
-            text-align: center;
-        }
-
-        h1 {
-            color: var(--text);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            font-size: 2rem;
-        }
-
-        header p {
-            color: var(--muted);
-            margin-top: 10px;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { margin-bottom: 40px; text-align: center; }
+        h1 { font-weight: 700; text-transform: uppercase; letter-spacing: 4px; font-size: 2rem; }
+        header p { color: var(--muted); margin-top: 10px; font-size: 0.9rem; letter-spacing: 1px; }
 
         .controls {
             background-color: var(--surface);
@@ -63,23 +36,9 @@
             gap: 20px;
             border: 1px solid var(--border);
         }
-
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            flex: 1;
-            min-width: 150px;
-        }
-
-        label {
-            font-size: 0.75rem;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            font-weight: 600;
-        }
-
+        .control-group { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 150px; }
+        label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
+        
         input[type="text"], input[type="number"], select {
             background-color: #000000;
             border: 1px solid var(--border);
@@ -90,21 +49,29 @@
             outline: none;
             transition: border-color 0.2s;
         }
-
-        input[type="text"]:focus, input[type="number"]:focus, select:focus {
-            border-color: var(--accent);
-        }
-
+        input[type="text"]:focus, input[type="number"]:focus, select:focus { border-color: var(--accent); }
+        
         select {
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
+            appearance: none; -webkit-appearance: none; -moz-appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888888' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            background-size: 1rem;
+            background-repeat: no-repeat; background-position: right 1rem center; background-size: 1rem;
             padding-right: 2.5rem;
         }
+
+        .toggles { display: flex; gap: 20px; padding-top: 10px; }
+        .toggle-label {
+            display: flex; align-items: center; gap: 8px; 
+            text-transform: none; letter-spacing: 0.5px; font-size: 0.9rem; color: var(--text);
+            cursor: pointer;
+            transition: color 0.2s, opacity 0.2s;
+        }
+        .toggle-label.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+        input[type="checkbox"] { width: 16px; height: 16px; accent-color: #fff; cursor: pointer; }
+        input[type="checkbox"]:disabled { cursor: not-allowed; }
 
         .preview-area {
             background-color: #ffffff;
@@ -114,25 +81,9 @@
             overflow-x: auto;
             border: 1px solid var(--border);
         }
-
-        #svg-canvas {
-            width: 100%;
-            height: 100%;
-            min-height: 300px;
-        }
-
-        .path-render {
-            fill: #000000; /* Font drawn in black on white background */
-            stroke: none;
-        }
-
-        .info {
-            margin-top: 20px;
-            font-size: 0.85rem;
-            color: var(--muted);
-            text-align: center;
-            letter-spacing: 0.5px;
-        }
+        #svg-canvas { width: 100%; height: 100%; min-height: 300px; }
+        .path-render { fill: #000000; stroke: none; }
+        .info { margin-top: 20px; font-size: 0.85rem; color: var(--muted); text-align: center; letter-spacing: 0.5px; }
     </style>
 </head>
 <body>
@@ -140,7 +91,7 @@
 <div class="container">
     <header>
         <h1>Typography Tester</h1>
-        <p>Select the font family and variant to test</p>
+        <p>Test SVG fonts with dynamic OpenType Features</p>
     </header>
     
     <div class="controls">
@@ -154,11 +105,18 @@
         </div>
         <div class="control-group" style="flex: 2;">
             <label for="textInput">Text</label>
-            <input type="text" id="textInput" value="Your Text Here" placeholder="Type something...">
+            <input type="text" id="textInput" value="Type few words. AVAVA, fi fl ff." placeholder="Type something...">
         </div>
         <div class="control-group" style="flex: 1;">
             <label for="sizeInput">Size (px)</label>
             <input type="number" id="sizeInput" value="80" min="10" max="250">
+        </div>
+        <div class="control-group" style="flex: 1; min-width: 180px;">
+            <label>OpenType Features</label>
+            <div class="toggles">
+                <label class="toggle-label" id="kerningLabel"><input type="checkbox" id="kerningToggle" checked> Kerning</label>
+                <label class="toggle-label" id="ligaLabel"><input type="checkbox" id="ligaToggle" checked> Ligatures</label>
+            </div>
         </div>
     </div>
 
@@ -166,10 +124,9 @@
         <svg id="svg-canvas" xmlns="http://www.w3.org/2000/svg"></svg>
     </div>
     
-    <div class="info">Embedded obfuscated fonts in the source code</div>
+    <div class="info">Features adapt automatically based on the selected font's availability</div>
 </div>
 
-<!-- Loads the database file generated with your fonts -->
 <script src="font-database.js"></script>
 <script>
     let fontsDB = {};
@@ -180,6 +137,10 @@
     const sizeInput = document.getElementById('sizeInput');
     const familySelect = document.getElementById('familySelect');
     const variantSelect = document.getElementById('variantSelect');
+    const kerningToggle = document.getElementById('kerningToggle');
+    const ligaToggle = document.getElementById('ligaToggle');
+    const kerningLabel = document.getElementById('kerningLabel');
+    const ligaLabel = document.getElementById('ligaLabel');
 
     // Unscrambles the database
     function loadDatabase() {
@@ -196,7 +157,6 @@
         }
     }
 
-    // Populates the Font Family dropdown
     function populateFamilyDropdown() {
         familySelect.innerHTML = '';
         for (let familyName in fontsDB) {
@@ -208,11 +168,9 @@
         populateVariantDropdown();
     }
 
-    // Populates the Variant dropdown based on the selected Font Family
     function populateVariantDropdown() {
         const selectedFamily = familySelect.value;
         variantSelect.innerHTML = '';
-        
         if (fontsDB[selectedFamily]) {
             for (let variantName in fontsDB[selectedFamily]) {
                 let option = document.createElement('option');
@@ -224,25 +182,42 @@
         loadActiveFont();
     }
 
-    // Loads the selected font into memory
     function loadActiveFont() {
         const family = familySelect.value;
         const variant = variantSelect.value;
         
         if (fontsDB[family] && fontsDB[family][variant]) {
             const fontData = fontsDB[family][variant];
+            
+            // Load font data
             currentFont = {
                 glyphs: fontData.glyphs,
+                ligatures: fontData.ligatures || {},
+                kerning: fontData.kerning || {},
                 unitsPerEm: fontData.m.u,
                 ascent: fontData.m.a,
                 descent: fontData.m.d,
                 defaultAdvance: fontData.m.da
             };
+
+            // --- DYNAMIC OPENTYPE FEATURE DETECTION ---
+            
+            // 1. Check Ligatures availability
+            const hasLigatures = Object.keys(currentFont.ligatures).length > 0;
+            ligaToggle.disabled = !hasLigatures;
+            ligaToggle.checked = hasLigatures; // Auto-enable if available
+            ligaLabel.classList.toggle('disabled', !hasLigatures);
+
+            // 2. Check Kerning availability
+            const hasKerning = Object.keys(currentFont.kerning).length > 0;
+            kerningToggle.disabled = !hasKerning;
+            kerningToggle.checked = hasKerning; // Auto-enable if available
+            kerningLabel.classList.toggle('disabled', !hasKerning);
+
             renderText();
         }
     }
 
-    // Draws the text on the screen
     function renderText() {
         if (!currentFont) return;
         const text = textInput.value;
@@ -258,21 +233,70 @@
         let cursorX = 20;
         const baselineY = currentFont.ascent * scale + 20;
 
-        for (let char of text) {
-            const glyph = currentFont.glyphs[char];
-            if (glyph) {
-                if (glyph.p !== '') {
+        // 1. Process Ligatures (Substitution) - Only if toggle is active and enabled
+        let renderQueue = [];
+        let i = 0;
+        while (i < text.length) {
+            let matched = false;
+            if (ligaToggle.checked && !ligaToggle.disabled) {
+                // Check for 3-character ligatures (ffi, ffl)
+                if (i < text.length - 2) {
+                    let tri = text.substring(i, i + 3);
+                    if (currentFont.ligatures[tri]) {
+                        renderQueue.push({ chars: tri, data: currentFont.ligatures[tri] });
+                        i += 3;
+                        matched = true;
+                    }
+                }
+                // Check for 2-character ligatures (fi, fl, ff)
+                if (!matched && i < text.length - 1) {
+                    let bi = text.substring(i, i + 2);
+                    if (currentFont.ligatures[bi]) {
+                        renderQueue.push({ chars: bi, data: currentFont.ligatures[bi] });
+                        i += 2;
+                        matched = true;
+                    }
+                }
+            }
+            if (!matched) {
+                let char = text[i];
+                renderQueue.push({ chars: char, data: currentFont.glyphs[char] || null });
+                i++;
+            }
+        }
+
+        // 2. Draw and Apply Kerning - Only if toggle is active and enabled
+        let prevChar = null;
+        
+        for (let item of renderQueue) {
+            let glyphData = item.data;
+            // For kerning, use the last char of the ligature or sequence
+            let currentChar = item.chars.charAt(item.chars.length - 1); 
+
+            // Apply Kerning
+            if (kerningToggle.checked && !kerningToggle.disabled && prevChar) {
+                let kernKey = `${prevChar}|${currentChar}`;
+                if (currentFont.kerning[kernKey] !== undefined) {
+                    cursorX += currentFont.kerning[kernKey] * scale;
+                }
+            }
+
+            if (glyphData) {
+                if (glyphData.p !== '') {
                     const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                    pathElement.setAttribute('d', glyph.p);
+                    pathElement.setAttribute('d', glyphData.p);
                     pathElement.setAttribute('class', 'path-render');
                     pathElement.setAttribute('transform', `translate(${cursorX}, ${baselineY}) scale(${scale})`);
                     svgCanvas.appendChild(pathElement);
                 }
-                cursorX += glyph.a * scale;
+                cursorX += glyphData.a * scale;
             } else {
                 cursorX += currentFont.defaultAdvance * scale;
             }
+            
+            prevChar = currentChar;
         }
+        
         svgCanvas.setAttribute('width', cursorX + 40);
     }
 
@@ -281,6 +305,8 @@
     variantSelect.addEventListener('change', loadActiveFont);
     textInput.addEventListener('input', renderText);
     sizeInput.addEventListener('input', renderText);
+    kerningToggle.addEventListener('change', renderText);
+    ligaToggle.addEventListener('change', renderText);
 
     // Initialization
     loadDatabase();
