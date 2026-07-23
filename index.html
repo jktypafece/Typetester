@@ -39,7 +39,7 @@
         input[type="checkbox"]:disabled { cursor: not-allowed; }
 
         .preview-area { background-color: #ffffff; border-radius: 8px; padding: 40px; min-height: 400px; overflow-x: auto; border: 1px solid var(--border); }
-        #svg-canvas { width: 100%; height: 100%; min-height: 300px; }
+        #svg-canvas { width: 100%; height: 100%; min-height: 300px; display: block; }
         .path-render { fill: #000000; stroke: none; }
         .info { margin-top: 20px; font-size: 0.85rem; color: var(--muted); text-align: center; letter-spacing: 0.5px; }
     </style>
@@ -172,7 +172,7 @@
             input.type = 'checkbox';
             input.id = `chk-${fc.tag}`;
             input.disabled = !hasData;
-            input.checked = hasData; // Auto-enable if available
+            input.checked = hasData;
             input.addEventListener('change', renderText);
             
             label.appendChild(input);
@@ -182,7 +182,6 @@
     }
 
     function getFeatureGlyphData(char) {
-        // Strict priority chain for single character substitution
         const priority = ['titl', 'swsh', 'sups', 'subs', 'hist', 'smcp', 'salt', 'ss05', 'ss04', 'ss03', 'ss02', 'ss01', 'zero', 'tnum', 'pnum', 'onum', 'lnum'];
         for (let tag of priority) {
             let chk = document.getElementById(`chk-${tag}`);
@@ -201,14 +200,9 @@
         svgCanvas.innerHTML = '';
         const scale = fontSize / currentFont.unitsPerEm;
         const lineHeight = (currentFont.ascent - currentFont.descent) * scale;
-        
-        svgCanvas.setAttribute('viewBox', `0 0 2000 ${lineHeight + 40}`);
-        svgCanvas.setAttribute('height', lineHeight + 40);
+        const padding = 20;
 
-        let cursorX = 20;
-        const baselineY = currentFont.ascent * scale + 20;
-
-        // 1. Ligature Processing
+        // 1. Process Ligatures
         let renderQueue = [];
         let i = 0;
         let ligaActive = document.getElementById('chk-liga') && document.getElementById('chk-liga').checked && !document.getElementById('chk-liga').disabled;
@@ -233,10 +227,41 @@
             }
         }
 
-        // 2. Draw and Kern
+        // 2. Calculate total width (First Pass)
         let kernActive = document.getElementById('chk-kern') && document.getElementById('chk-kern').checked && !document.getElementById('chk-kern').disabled;
         let prevChar = null;
+        let tempCursorX = padding;
         
+        for (let item of renderQueue) {
+            let gd = item.data;
+            let cc = item.chars.charAt(item.chars.length - 1); 
+
+            if (kernActive && prevChar && currentFont.kerning[`${prevChar}|${cc}`] !== undefined) {
+                tempCursorX += currentFont.kerning[`${prevChar}|${cc}`] * scale;
+            }
+
+            if (gd) {
+                tempCursorX += gd.a * scale;
+            } else {
+                tempCursorX += currentFont.defaultAdvance * scale;
+            }
+            prevChar = cc;
+        }
+        
+        // 3. Set dynamic ViewBox to exactly match the text bounds
+        const totalWidth = Math.max(tempCursorX + padding, 100); // Min width 100 to prevent collapse
+        const totalHeight = lineHeight + (padding * 2);
+
+        svgCanvas.setAttribute('viewBox', `0 0 ${totalWidth} ${totalHeight}`);
+        svgCanvas.setAttribute('width', '100%');
+        svgCanvas.setAttribute('height', totalHeight);
+        svgCanvas.setAttribute('preserveAspectRatio', 'xMinYMin meet');
+
+        // 4. Draw paths (Second Pass)
+        let cursorX = padding;
+        const baselineY = currentFont.ascent * scale + padding;
+        prevChar = null;
+
         for (let item of renderQueue) {
             let gd = item.data;
             let cc = item.chars.charAt(item.chars.length - 1); 
@@ -250,7 +275,7 @@
                     const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
                     p.setAttribute('d', gd.p);
                     p.setAttribute('class', 'path-render');
-                    p.setAttribute('transform', `translate(${cursorX}, ${baselineY}) scale(${scale})`);
+                    p.setAttribute('transform', `translate(${cursorX}, ${baselineY}) scale(${scale}, -${scale})`);
                     svgCanvas.appendChild(p);
                 }
                 cursorX += gd.a * scale;
@@ -259,7 +284,6 @@
             }
             prevChar = cc;
         }
-        svgCanvas.setAttribute('width', cursorX + 40);
     }
 
     familySelect.addEventListener('change', populateVariantDropdown);
